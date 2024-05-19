@@ -1,0 +1,7 @@
+ARG_ENABLE('uuid', 'uuid support', 'no');
+
+if (PHP_UUID != 'no') {
+	AC_DEFINE('HAVE_UUID', 1, 'uuid support enabled');
+
+	EXTENSION('uuid', 'uuid.c', null, '/DZEND_ENABLE_STATIC_TSRMLS_CACHE=1');
+}
