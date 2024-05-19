@@ -1,13 +1,10 @@
 --TEST--
-test1() Basic test
+uuid_v4() Returns a string
 --EXTENSIONS--
 uuid
 --FILE--
 <?php
-$ret = test1();
-
-var_dump($ret);
+echo gettype(uuid_v4());
 ?>
 --EXPECT--
-The extension uuid is loaded and working!
-NULL
+string

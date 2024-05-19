@@ -1,5 +1,3 @@
-/* uuid extension for PHP */
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -9,39 +7,45 @@
 #include "php_uuid.h"
 #include "uuid_arginfo.h"
 
-/* For compatibility with older PHP versions */
+#include <stdlib.h>
+#include <time.h>
+
 #ifndef ZEND_PARSE_PARAMETERS_NONE
 #define ZEND_PARSE_PARAMETERS_NONE() \
 	ZEND_PARSE_PARAMETERS_START(0, 0) \
 	ZEND_PARSE_PARAMETERS_END()
 #endif
 
-/* {{{ void test1() */
-PHP_FUNCTION(test1)
+PHP_FUNCTION(uuid_v4)
 {
 	ZEND_PARSE_PARAMETERS_NONE();
 
-	php_printf("The extension %s is loaded and working!\r\n", "uuid");
+	unsigned char data[16];
+	char* uuid = (char*)malloc(37 * sizeof(char));
+
+	srand((unsigned int)time(NULL));
+
+	for (int i = 0; i < 16; i++) {
+        data[i] = rand() % 256;
+    }
+
+    data[6] = (data[6] & 0x0F) | 0x40;
+    data[8] = (data[8] & 0x3F) | 0x80;
+
+    sprintf(uuid,
+            "%02x%02x%02x%02x-"
+            "%02x%02x-"
+            "%02x%02x-"
+            "%02x%02x-"
+            "%02x%02x%02x%02x%02x%02x",
+            data[0], data[1], data[2], data[3],
+            data[4], data[5],
+            data[6], data[7],
+            data[8], data[9],
+            data[10], data[11], data[12], data[13], data[14], data[15]);
+
+    RETURN_STRING(uuid);
 }
-/* }}} */
-
-/* {{{ string test2( [ string $var ] ) */
-PHP_FUNCTION(test2)
-{
-	char *var = "World";
-	size_t var_len = sizeof("World") - 1;
-	zend_string *retval;
-
-	ZEND_PARSE_PARAMETERS_START(0, 1)
-		Z_PARAM_OPTIONAL
-		Z_PARAM_STRING(var, var_len)
-	ZEND_PARSE_PARAMETERS_END();
-
-	retval = strpprintf(0, "Hello %s", var);
-
-	RETURN_STR(retval);
-}
-/* }}}*/
 
 /* {{{ PHP_RINIT_FUNCTION */
 PHP_RINIT_FUNCTION(uuid)
